@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// Ezinne & Chigozie — Wedding Prototype
+// Paste into: Firebase console → Firestore Database → Rules → Publish
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /rsvps/{rsvpId} {
+      // Anyone may submit an RSVP, but only with valid, bounded fields.
+      // submittedAt must be the server timestamp (FieldValue.serverTimestamp()).
+      allow create: if request.resource.data.keys().hasOnly(
+            ['firstName','lastName','phone','attending','country','state','message','submittedAt'])
+        && request.resource.data.firstName is string
+        && request.resource.data.firstName.size() >= 1
+        && request.resource.data.firstName.size() <= 60
+        && request.resource.data.lastName is string
+        && request.resource.data.lastName.size() >= 1
+        && request.resource.data.lastName.size() <= 60
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() >= 7
+        && request.resource.data.phone.size() <= 30
+        && request.resource.data.attending in ['yes','no']
+        && request.resource.data.country is string
+        && request.resource.data.country.size() <= 80
+        && request.resource.data.state is string
+        && request.resource.data.state.size() <= 80
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 1000
+        && request.resource.data.submittedAt == request.time;
+
+      // Prototype mode: the admin page gates reads with a client-side
+      // passcode. For stronger protection, enable Firebase Auth on the
+      // admin flow and change this line to:
+      //   allow read: if request.auth != null;
+      allow read: if true;
+
+      // Guests can never modify or delete submissions.
+      allow update, delete: if false;
+    }
+
+    // Deny everything else.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

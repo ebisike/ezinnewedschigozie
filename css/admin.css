@@ -1,0 +1,248 @@
+/* =================================================================
+   Admin Dashboard — Ezinne & Chigozie Wedding Prototype
+   Extends the main champagne theme (css/style.css)
+================================================================= */
+
+/* The hidden attribute must win over Bootstrap display utilities (d-flex). */
+[hidden] { display: none !important; }
+
+.admin-body {
+  background: linear-gradient(160deg, #3a2e1c, #5a4a30 55%, #3a2e1c);
+  min-height: 100vh;
+  color: var(--text-on-dark);
+}
+
+/* ---------- Passcode gate ---------- */
+.gate {
+  min-height: 100vh;
+  padding: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.gate-card {
+  width: 100%; max-width: 420px;
+  background: var(--white-soft);
+  border-radius: 26px;
+  padding: clamp(1.8rem, 5vw, 3rem);
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(201,169,106,.35);
+  animation: gateIn .5s ease both;
+}
+@keyframes gateIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.gate-ornament {
+  display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 1rem;
+  border-radius: 50%; font-size: 1.6rem; color: var(--rose-deep);
+  background: rgba(216,181,177,.18); border: 1px solid rgba(143,91,85,.3);
+}
+.gate-title {
+  font-family: var(--font-display); font-weight: 700;
+  color: var(--burgundy-deep); font-size: 1.7rem; margin-bottom: .2rem;
+}
+.gate-sub {
+  font-family: var(--font-script); font-style: italic;
+  color: var(--text-muted); margin-bottom: 1.6rem;
+}
+.gate-card .form-label {
+  font-size: .82rem; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--burgundy-deep); font-weight: 600; text-align: left;
+}
+.gate-card .input-group-text {
+  background: var(--burgundy-deep); color: #fff; border: none; border-radius: 10px 0 0 10px;
+}
+.gate-card .form-control {
+  border: 1.5px solid rgba(90,74,48,.22); border-left: none;
+  padding: .65rem .9rem; letter-spacing: 3px; text-align: center; font-size: 1.05rem;
+}
+.gate-card .form-control:focus {
+  border-color: var(--rose-deep); box-shadow: 0 0 0 .2rem rgba(143,91,85,.18);
+}
+.btn-gate-submit {
+  background: var(--burgundy-deep); color: #fff; border: none;
+  border-radius: 0 10px 10px 0; font-weight: 700; padding: 0 1.4rem;
+  text-transform: uppercase; font-size: .85rem; letter-spacing: .5px;
+}
+.btn-gate-submit:hover { background: #3a2e1c; color: #fff; }
+.gate-error {
+  margin-top: .8rem; font-size: .85rem; color: #a94442; font-weight: 600;
+}
+.gate-hint {
+  margin: 1.4rem 0 0; font-size: .78rem; color: var(--text-muted); font-style: italic;
+}
+
+/* ---------- Dashboard chrome ---------- */
+.admin-nav {
+  background: linear-gradient(90deg, rgba(58,46,28,.97), rgba(90,74,48,.95));
+  box-shadow: 0 4px 18px rgba(0,0,0,.3);
+  padding: .8rem 0;
+  position: sticky; top: 0; z-index: 10;
+}
+.admin-nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .8rem; flex-wrap: wrap;
+}
+.admin-nav-actions { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.admin-brand {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: #fff;
+}
+.admin-brand i { color: var(--rose-light); }
+.admin-count-badge {
+  background: rgba(226,200,127,.15); border: 1px solid rgba(226,200,127,.4);
+  color: var(--gold-light); border-radius: 50px;
+  padding: .35rem .9rem; font-size: .8rem; font-weight: 600;
+  white-space: nowrap;
+}
+.btn-admin-refresh, .btn-admin-export, .btn-admin-lock {
+  border-radius: 10px; font-size: .8rem; font-weight: 700;
+  padding: .4rem .8rem; text-transform: uppercase; letter-spacing: .4px;
+  white-space: nowrap;
+}
+.btn-admin-refresh {
+  background: rgba(255,255,255,.1); color: #fff; border: 1px solid rgba(255,255,255,.25);
+}
+.btn-admin-refresh:hover { background: rgba(255,255,255,.2); color: #fff; }
+.btn-admin-export {
+  background: var(--gold); color: var(--text-on-gold); border: none;
+}
+.btn-admin-export:hover { background: var(--gold-light); color: var(--text-on-gold); }
+.btn-admin-lock {
+  background: var(--rose-deep); color: #fff; border: none;
+}
+.btn-admin-lock:hover { background: #7a4b46; color: #fff; }
+
+/* ---------- Summary cards ---------- */
+.admin-summary { margin-top: 1.4rem; }
+.stat-card {
+  display: flex; align-items: center; gap: .9rem;
+  background: var(--white-soft); border-radius: 18px;
+  padding: 1rem 1.2rem; box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(201,169,106,.25);
+}
+.stat-card i { font-size: 1.6rem; color: var(--burgundy-deep); }
+.stat-card strong {
+  display: block; font-family: var(--font-display); font-size: 1.6rem;
+  line-height: 1.1; color: var(--burgundy-deep);
+}
+.stat-card span { font-size: .78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; }
+.stat-attending i { color: #6f8a54; }
+.stat-attending strong { color: #54683c; }
+.stat-declined i { color: var(--rose-deep); }
+.stat-declined strong { color: var(--rose-deep); }
+.stat-latest i { color: var(--gold); }
+.stat-latest strong { font-size: 1rem; margin-top: .2rem; }
+
+/* ---------- Toolbar ---------- */
+.admin-toolbar {
+  margin-top: 1.4rem; display: flex; gap: .8rem; flex-wrap: wrap;
+}
+.admin-search { flex: 1 1 260px; max-width: 420px; }
+.admin-search .input-group-text {
+  background: var(--white-soft); border: 1.5px solid rgba(90,74,48,.15); color: var(--text-muted);
+}
+.admin-search .form-control {
+  border: 1.5px solid rgba(90,74,48,.15); border-left: none;
+  background: var(--white-soft); padding: .55rem .9rem;
+}
+.admin-filter {
+  flex: 0 0 200px; background: var(--white-soft);
+  border: 1.5px solid rgba(90,74,48,.15); padding: .55rem .9rem;
+}
+
+/* ---------- Table ---------- */
+.admin-table-wrap {
+  margin-top: 1.2rem; padding-bottom: 2.5rem;
+}
+.admin-table {
+  background: var(--white-soft); border-radius: 18px; overflow: hidden;
+  box-shadow: var(--shadow-md); border: 1px solid rgba(201,169,106,.25);
+}
+.admin-table thead th {
+  background: var(--burgundy-deep); color: var(--gold-light);
+  font-size: .75rem; text-transform: uppercase; letter-spacing: 1px;
+  padding: .9rem 1rem; border-bottom: none; white-space: nowrap;
+}
+.admin-table tbody td {
+  padding: .8rem 1rem; font-size: .9rem; color: var(--text-dark);
+  border-color: rgba(90,74,48,.1); vertical-align: top;
+}
+.admin-table tbody tr:hover { background: rgba(216,181,177,.1); }
+.admin-empty-row td {
+  text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-style: italic;
+}
+.attend-pill {
+  display: inline-block; padding: .25rem .8rem; border-radius: 50px;
+  font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+}
+.attend-yes { background: rgba(111,138,84,.16); color: #54683c; border: 1px solid rgba(111,138,84,.35); }
+.attend-no { background: rgba(143,91,85,.14); color: var(--rose-deep); border: 1px solid rgba(143,91,85,.3); }
+.msg-cell { max-width: 260px; }
+.msg-text { color: var(--text-muted); font-style: italic; }
+.submitted-cell { white-space: nowrap; color: var(--text-muted); font-size: .82rem; }
+.submitted-cell strong { color: var(--burgundy-deep); display: block; font-size: .9rem; }
+
+/* ---------- Responsive ---------- */
+
+/* Icon-only nav buttons on small screens */
+@media (max-width: 767px) {
+  .admin-nav .btn-label { display: none; }
+  .admin-nav .btn { padding: .45rem .7rem; font-size: .95rem; }
+  .admin-nav-actions { width: 100%; justify-content: space-between; }
+  .admin-count-badge { padding: .45rem .8rem; }
+  .admin-toolbar { flex-direction: column; gap: .6rem; }
+  /* reset the desktop flex-basis, which becomes vertical height in column mode */
+  .admin-search { flex: 0 0 auto; max-width: 100%; width: 100%; }
+  .admin-filter { flex: 0 0 auto; width: 100%; }
+  .stat-card { padding: .8rem .9rem; gap: .6rem; }
+  .stat-card i { font-size: 1.25rem; }
+  .stat-card strong { font-size: 1.35rem; }
+  .stat-latest strong { font-size: .92rem; }
+  .gate-title { font-size: 1.45rem; }
+}
+
+/* Stacked card table on phones — no horizontal scrolling */
+@media (max-width: 640px) {
+  .admin-table-scroll { overflow-x: hidden; }
+  .admin-table, .admin-table thead, .admin-table tbody,
+  .admin-table tr, .admin-table td, .admin-table th {
+    display: block; width: 100%;
+    box-sizing: border-box;
+  }
+  .admin-table thead { display: none; }
+  .admin-table { border-radius: 0; box-shadow: none; background: transparent; border: none; }
+
+  .admin-table tbody tr {
+    background: var(--white-soft);
+    border: 1px solid rgba(201,169,106,.25);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: .9rem;
+    padding: .4rem .2rem;
+  }
+  .admin-table tbody tr:hover { background: var(--white-soft); }
+  .admin-table tbody td {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1rem; padding: .55rem .9rem;
+    border: none; border-bottom: 1px dashed rgba(90,74,48,.12);
+  }
+  .admin-table tbody td:last-child { border-bottom: none; }
+  .admin-table tbody td::before {
+    content: attr(data-label);
+    flex: 0 0 38%;
+    font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
+    color: var(--text-muted);
+  }
+  .admin-table tbody td[data-label] { text-align: right; }
+  .admin-table tbody td.msg-cell { max-width: none; text-align: right; }
+  .admin-empty-row td { text-align: center; }
+  .admin-empty-row td::before { content: none; }
+  .submitted-cell { white-space: normal; }
+}
+
+/* Very small phones */
+@media (max-width: 400px) {
+  .admin-brand { font-size: .9rem; }
+  .gate-card { padding: 1.6rem 1.2rem; }
+  .admin-summary { padding: 0 .6rem; }
+}
