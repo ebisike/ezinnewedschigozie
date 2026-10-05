@@ -61,23 +61,47 @@
       showGateError();
       return;
     }
+
+    // Valid passcode — always reveal the dashboard, whatever the data state.
+    unlocked = true;
+    currentPasscode = passcode;
+    if (gateError) gateError.hidden = true;
+    gate.hidden = true;
+    dashboard.hidden = false;
+
     if (!window.WED_FIREBASE_READY || typeof firebase === "undefined") {
-      showGateError("Firebase is not configured yet — edit js/firebase-config.js.");
+      rsvps = [];
+      renderStats();
+      showTableNotice(
+        "Firebase is not configured yet. Edit js/firebase-config.js with your project keys, then reload this page."
+      );
       return;
     }
+
     loadRsvps()
       .then(function (data) {
-        unlocked = true;
-        currentPasscode = passcode;
         rsvps = data;
-        gate.hidden = true;
-        dashboard.hidden = false;
         render();
       })
       .catch(function (err) {
-        console.error(err);
-        showGateError("Could not load submissions. Check your connection and Firebase setup.");
+        console.error("Failed to load RSVPs:", err);
+        rsvps = [];
+        renderStats();
+        showTableNotice(
+          "Could not load submissions (" +
+            (err && err.code ? err.code : "network error") +
+            "). Check your internet connection, and that the Firestore rules from firestore.rules are published."
+        );
       });
+  }
+
+  function showTableNotice(msg) {
+    if (!tableBody) return;
+    tableBody.innerHTML =
+      '<tr class="admin-empty-row"><td colspan="8">' +
+      escapeHtml(msg) +
+      "</td></tr>";
+    if (countBadge) countBadge.textContent = "0 submissions";
   }
 
   function showGateError(msg) {
@@ -160,11 +184,7 @@
     });
   }
 
-  function render() {
-    var list = rsvps.slice().sort(function (a, b) {
-      return asDate(b.submittedAt) - asDate(a.submittedAt);
-    });
-
+  function renderStats(list) {
     var total = list.length;
     var attending = 0;
     var declined = 0;
@@ -178,6 +198,14 @@
     if (statDeclined) statDeclined.textContent = String(declined);
     if (statLatest) statLatest.textContent = total ? formatDate(list[0].submittedAt) : "—";
     if (countBadge) countBadge.textContent = total + (total === 1 ? " submission" : " submissions");
+  }
+
+  function render() {
+    var list = rsvps.slice().sort(function (a, b) {
+      return asDate(b.submittedAt) - asDate(a.submittedAt);
+    });
+
+    renderStats(list);
 
     var filtered = visibleRsvps();
     if (!tableBody) return;
@@ -185,7 +213,7 @@
     if (!filtered.length) {
       tableBody.innerHTML =
         '<tr class="admin-empty-row"><td colspan="8">' +
-        (total ? "No matches for your search." : "No submissions yet. RSVPs will appear here.") +
+        (rsvps.length ? "No matches for your search." : "No submissions yet. RSVPs will appear here.") +
         "</td></tr>";
       return;
     }

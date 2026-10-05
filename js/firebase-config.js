@@ -12,14 +12,24 @@
 (function () {
   "use strict";
 
-  var firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+//  var firebaseConfig = {
+//   apiKey: "YOUR_API_KEY", // See instructions below to retrieve this
+//   authDomain: "ezichi2026.firebaseapp.com",
+//   projectId: "ezichi2026",
+//   storageBucket: "ezichi2026.appspot.com",
+//   messagingSenderId: "349447907893",
+//   appId: "YOUR_APP_ID" // Unique to your registered Web App
+// };
+
+var firebaseConfig = {
+  apiKey: "AIzaSyCuPbJr2mfPkk8VEb6XkPPXf3FaxAGfaWE",
+  authDomain: "ezichi2026.firebaseapp.com",
+  projectId: "ezichi2026",
+  storageBucket: "ezichi2026.firebasestorage.app",
+  messagingSenderId: "349447907893",
+  appId: "1:349447907893:web:978654096020ea255d9f7c",
+  measurementId: "G-B2HVFSTYMK"
+};
 
   window.WED_FIREBASE_READY = false;
 

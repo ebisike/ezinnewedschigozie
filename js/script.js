@@ -376,6 +376,58 @@
     videoModalEl.addEventListener("hide.bs.modal", stopVideo);
   }
 
+  /* ---------- Video row: arrows + mouse drag-to-swipe ---------- */
+  var videoRow = document.querySelector(".video-grid");
+  var videoPrev = document.querySelector(".video-arrow-prev");
+  var videoNext = document.querySelector(".video-arrow-next");
+
+  if (videoRow) {
+    function videoStep(dir) {
+      var card = videoRow.querySelector(".video-card");
+      var w = card ? card.offsetWidth + 20 : videoRow.clientWidth * 0.8;
+      videoRow.scrollBy({ left: dir * w, behavior: "smooth" });
+    }
+    if (videoPrev) videoPrev.addEventListener("click", function () { videoStep(-1); });
+    if (videoNext) videoNext.addEventListener("click", function () { videoStep(1); });
+
+    // Desktop: hold and drag to swipe (touch devices scroll natively).
+    var dragging = false;
+    var dragMoved = false;
+    var dragStartX = 0;
+    var dragStartScroll = 0;
+
+    videoRow.addEventListener("pointerdown", function (e) {
+      if (e.pointerType !== "mouse") return;
+      dragging = true;
+      dragMoved = false;
+      dragStartX = e.clientX;
+      dragStartScroll = videoRow.scrollLeft;
+      videoRow.classList.add("dragging");
+    });
+
+    window.addEventListener("pointermove", function (e) {
+      if (!dragging) return;
+      var dx = e.clientX - dragStartX;
+      if (Math.abs(dx) > 6) dragMoved = true;
+      videoRow.scrollLeft = dragStartScroll - dx;
+    });
+
+    window.addEventListener("pointerup", function () {
+      if (!dragging) return;
+      dragging = false;
+      videoRow.classList.remove("dragging");
+    });
+
+    // Don't open the video modal if the click was really the end of a drag.
+    videoRow.addEventListener("click", function (e) {
+      if (dragMoved) {
+        e.preventDefault();
+        e.stopPropagation();
+        dragMoved = false;
+      }
+    }, true);
+  }
+
   /* ---------- Wishes: equal-height clamp + Read more ---------- */
   function initWishCards() {
     var cards = document.querySelectorAll(".wish-card");

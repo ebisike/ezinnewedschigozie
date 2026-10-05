@@ -324,13 +324,15 @@ img { max-width: 100%; }
   display: grid; grid-template-columns: 1fr; gap: 1.6rem; align-items: center;
 }
 @media (min-width: 768px) {
-  .milestone { grid-template-columns: 240px 1fr; gap: 3rem; }
+  .milestone { grid-template-columns: 250px 1fr; gap: 1.75rem; }
+  .milestone.flip { grid-template-columns: 1fr 250px; }
   .milestone.flip .mile-img { order: 2; }
   .milestone.flip .mile-text { order: 1; text-align: right; }
 }
 .mile-img {
-  aspect-ratio: 3/4; border-radius: 999px 999px 14px 14px;
+  aspect-ratio: 4/5; border-radius: 22px;
   overflow: hidden; background: var(--card-2); border: 1px solid var(--hairline);
+  max-width: 300px; margin-left: auto; margin-right: auto; width: 100%;
 }
 .mile-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .mile-year {
@@ -358,14 +360,39 @@ img { max-width: 100%; }
 .arch img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .arch:hover { opacity: .88; }
 
-/* ---- Videos (how well do you know us) — YouTube Shorts, portrait ---- */
+/* ---- Videos (how well do you know us) — swipeable Shorts row ---- */
+.video-swipe { position: relative; }
 .video-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
-  gap: 1.2rem;
+  display: flex; gap: 1.2rem;
+  overflow-x: auto; overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: .25rem .25rem .5rem;
+  user-select: none;
+  cursor: grab;
+  scrollbar-width: none;           /* Firefox */
+  -ms-overflow-style: none;        /* old Edge/IE */
 }
-@media (min-width: 768px) {
-  .video-grid { grid-template-columns: repeat(5, 1fr); }
+.video-grid::-webkit-scrollbar { display: none; }  /* Chrome/Safari/Edge */
+.video-grid.dragging { cursor: grabbing; scroll-snap-type: none; }
+.video-grid .video-card {
+  flex: 0 0 clamp(170px, 24vw, 230px);
+  scroll-snap-align: start;
 }
+.video-arrow {
+  position: absolute; top: 40%; transform: translateY(-50%); z-index: 3;
+  background: rgba(13,13,13,.72); color: var(--gold);
+  border: 1px solid var(--gold-faint); border-radius: 50%;
+  width: 42px; height: 42px; font-size: 1.25rem; line-height: 1;
+  display: grid; place-items: center; cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: color .2s, border-color .2s;
+}
+.video-arrow:hover { color: var(--gold-hover); border-color: var(--gold-soft); }
+.video-arrow-prev { left: -8px; }
+.video-arrow-next { right: -8px; }
+@media (max-width: 767px) { .video-arrow { display: none; } }
 .video-card {
   background: var(--card-2); border: 1px solid var(--hairline);
   border-radius: 16px; overflow: hidden; cursor: pointer;
@@ -424,10 +451,52 @@ img { max-width: 100%; }
 @media (min-width: 700px) { .wish-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1000px) { .wish-grid { grid-template-columns: repeat(3, 1fr); } }
 .wish-card {
-  background: var(--card-1); border: 1px solid var(--hairline);
+  position: relative; overflow: hidden;
+  background: linear-gradient(160deg, var(--card-1), #161616);
+  border: 1px solid var(--hairline);
   border-radius: 14px; padding: 1.6rem;
+  transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease;
 }
-.wish-who { font-family: var(--font-display); color: var(--gold); font-size: .95rem; margin: 0 0 .8rem; }
+/* staggered entrance — cards ripple in as the grid reveals */
+.wish-grid .wish-card { opacity: 0; transform: translateY(22px); }
+.wish-grid.visible .wish-card {
+  opacity: 1; transform: translateY(0);
+  transition:
+    opacity .7s ease,
+    transform .7s cubic-bezier(.22, .61, .36, 1),
+    border-color .35s ease,
+    box-shadow .35s ease;
+}
+.wish-grid.visible .wish-card:nth-child(3n+2) { transition-delay: .12s; }
+.wish-grid.visible .wish-card:nth-child(3n+3) { transition-delay: .24s; }
+/* hover — lift with a soft gold glow */
+.wish-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--gold-faint);
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.5),
+    0 0 0 1px rgba(201,164,77,.12),
+    0 0 34px rgba(201,164,77,.10);
+}
+/* gold accent line draws across the top */
+.wish-card::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0); transform-origin: center;
+  transition: transform .45s ease;
+}
+.wish-card:hover::before { transform: scaleX(1); }
+/* light sheen sweeps across on hover */
+.wish-card::after {
+  content: ""; position: absolute; top: -60%; bottom: -60%; left: -30%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(201,164,77,.09), transparent);
+  transform: rotate(18deg) translateX(-160%);
+  transition: transform .8s ease; pointer-events: none;
+}
+.wish-card:hover::after { transform: rotate(18deg) translateX(420%); }
+.wish-who { font-family: var(--font-display); color: var(--gold); font-size: .95rem; margin: 0 0 .8rem; transition: color .3s ease; }
+.wish-card:hover .wish-who { color: var(--gold-hover); }
 .wish-who .role { color: var(--gold-soft); }
 .wish-text {
   font-family: var(--font-display); font-style: italic; font-weight: 400;
