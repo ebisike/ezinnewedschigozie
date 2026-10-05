@@ -475,6 +475,8 @@
   var THEME_KEY = "ec-theme";
 
   if (themePicker && themePanel && themePickerBtn) {
+    var themeTip = document.getElementById("themeTip");
+
     function applyTheme(name) {
       if (name) document.documentElement.setAttribute("data-theme", name);
       else document.documentElement.removeAttribute("data-theme");
@@ -488,6 +490,26 @@
     var savedTheme = "";
     try { savedTheme = localStorage.getItem(THEME_KEY) || ""; } catch (e) {}
     if (savedTheme) applyTheme(savedTheme);
+
+    // animated "pick a palette" nudge — shows on every page load
+    if (themeTip) {
+      setTimeout(function () { themeTip.classList.add("show"); }, 2200);
+
+      var hideThemeTip = function () {
+        themeTip.classList.remove("show");
+      };
+      // auto-hide after a while
+      var tipTimer = setTimeout(hideThemeTip, 15000);
+
+      // clicking the tip opens the picker
+      themeTip.addEventListener("click", function () {
+        clearTimeout(tipTimer);
+        hideThemeTip();
+        themePickerBtn.click();
+      });
+      // opening the picker any other way dismisses it too
+      themePickerBtn.addEventListener("click", hideThemeTip);
+    }
 
     themePickerBtn.addEventListener("click", function (e) {
       e.stopPropagation();
