@@ -468,4 +468,41 @@
     });
   }
   window.addEventListener("load", initWishCards);
+  /* ---------- Theme picker (explore palettes) ---------- */
+  var themePicker = document.getElementById("themePicker");
+  var themePanel = document.getElementById("themePanel");
+  var themePickerBtn = document.getElementById("themePickerBtn");
+  var THEME_KEY = "ec-theme";
+
+  if (themePicker && themePanel && themePickerBtn) {
+    function applyTheme(name) {
+      if (name) document.documentElement.setAttribute("data-theme", name);
+      else document.documentElement.removeAttribute("data-theme");
+      try { localStorage.setItem(THEME_KEY, name || ""); } catch (e) {}
+      themePanel.querySelectorAll(".theme-chip").forEach(function (chip) {
+        chip.classList.toggle("is-active", chip.getAttribute("data-theme") === (name || ""));
+      });
+    }
+
+    // restore saved choice
+    var savedTheme = "";
+    try { savedTheme = localStorage.getItem(THEME_KEY) || ""; } catch (e) {}
+    if (savedTheme) applyTheme(savedTheme);
+
+    themePickerBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      themePanel.hidden = !themePanel.hidden;
+    });
+
+    themePanel.addEventListener("click", function (e) {
+      var chip = e.target.closest(".theme-chip");
+      if (!chip) return;
+      applyTheme(chip.getAttribute("data-theme") || "");
+      themePanel.hidden = true;
+    });
+
+    document.addEventListener("click", function (e) {
+      if (!themePicker.contains(e.target)) themePanel.hidden = true;
+    });
+  }
 })();
