@@ -309,8 +309,39 @@ img { max-width: 100%; }
 .venue-item i { color: var(--gold); font-size: 1.25rem; margin-top: .1rem; }
 .venue-item strong { display: block; color: var(--text-main); font-size: .8rem; letter-spacing: .22em; text-transform: uppercase; margin-bottom: .25rem; }
 .venue-item span { font-size: .85rem; color: var(--white-45); line-height: 1.5; }
-.invite-dress { color: var(--white-30); font-size: .85rem; margin-bottom: 1.8rem; }
-.invite-dress i { color: var(--gold); }
+/* colors of the day — interactive swatches */
+.day-colors { text-align: center; margin-bottom: 1.8rem; }
+.day-colors-label {
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .4em; color: var(--white-45); margin: 0 0 1.1rem;
+}
+.color-swatches { display: flex; justify-content: center; gap: 1.6rem; }
+.swatch { display: inline-flex; flex-direction: column; align-items: center; gap: .55rem; }
+.swatch i {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--sw);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.1), 0 0 0 1px var(--hairline);
+  display: inline-block;
+  animation: swatchPulse 3.2s ease-in-out infinite;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
+}
+.swatch:nth-child(2) i { animation-delay: .45s; }
+.swatch:nth-child(3) i { animation-delay: .9s; }
+@keyframes swatchPulse {
+  0%, 100% { transform: translateY(0); box-shadow: inset 0 0 0 1px rgba(0,0,0,.1), 0 0 0 1px var(--hairline); }
+  50%      { transform: translateY(-3px); box-shadow: inset 0 0 0 1px rgba(0,0,0,.1), 0 0 0 1px var(--gold-faint), 0 6px 16px -2px var(--sw); }
+}
+.swatch:hover i {
+  animation: none;
+  transform: translateY(-5px) scale(1.14);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.1), 0 0 0 2px var(--gold-soft), 0 10px 22px -2px var(--sw);
+}
+.swatch em {
+  font-style: normal; font-size: 8.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .28em;
+  color: var(--white-30); transition: color .25s ease;
+}
+.swatch:hover em { color: var(--text-main); }
 
 .schedule { display: grid; gap: .8rem; }
 .sched-item {
