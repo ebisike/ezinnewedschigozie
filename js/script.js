@@ -675,13 +675,39 @@
       card.dataset.rot = rot;
     }
 
+    // keep cards inside the (edge-to-edge) board
+    function clampToBoard(card, xPct, yPct) {
+      var bw = scrapBoard.clientWidth || 1;
+      var ch = scrapBoard.clientHeight || 1;
+      var cw = card.offsetWidth || 140;
+      var chh = card.offsetHeight || 190;
+      var maxX = Math.max(0, (bw - cw) / bw * 100);
+      var maxY = Math.max(0, (ch - chh) / ch * 100);
+      return [Math.min(xPct, maxX), Math.min(yPct, maxY)];
+    }
+
     function layoutScrapbook() {
       for (var i = 0; i < polaroids.length; i++) {
         var spot = SCRAP_LAYOUT[i % SCRAP_LAYOUT.length];
-        placePolaroid(polaroids[i], spot[0], spot[1], spot[2]);
+        var pos = clampToBoard(polaroids[i], spot[0], spot[1]);
+        placePolaroid(polaroids[i], pos[0], pos[1], spot[2]);
       }
     }
     layoutScrapbook();
+
+    // re-clamp after images size up / window resizes
+    var scrapResizeTimer = null;
+    window.addEventListener("resize", function () {
+      clearTimeout(scrapResizeTimer);
+      scrapResizeTimer = setTimeout(function () {
+        polaroids.forEach(function (card) {
+          var x = parseFloat(card.style.left) || 0;
+          var y = parseFloat(card.style.top) || 0;
+          var pos = clampToBoard(card, x, y);
+          placePolaroid(card, pos[0], pos[1], parseFloat(card.dataset.rot) || 0);
+        });
+      }, 150);
+    });
 
     polaroids.forEach(function (card) {
       card.addEventListener("pointerdown", function (e) {
@@ -733,10 +759,9 @@
       shuffleBtn.addEventListener("click", function () {
         polaroids.forEach(function (card) {
           card.classList.add("moving");
-          var x = Math.random() * 80;
-          var y = Math.random() * 74;
+          var pos = clampToBoard(card, Math.random() * 80, Math.random() * 74);
           var rot = Math.random() * 20 - 10;
-          placePolaroid(card, x, y, rot);
+          placePolaroid(card, pos[0], pos[1], rot);
         });
         setTimeout(function () {
           polaroids.forEach(function (card) { card.classList.remove("moving"); });
