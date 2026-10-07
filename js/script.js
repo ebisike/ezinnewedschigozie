@@ -644,14 +644,38 @@
     // photo lightbox
     var photoModalEl = document.getElementById("photoModal");
     var photoViewer = document.getElementById("photoViewer");
+    var photoPrevBtn = document.getElementById("photoPrev");
+    var photoNextBtn = document.getElementById("photoNext");
     var photoModalInstance =
       photoModalEl && window.bootstrap && bootstrap.Modal
         ? bootstrap.Modal.getOrCreateInstance(photoModalEl)
         : null;
 
+    var photoSrcs = [];
+    var photoIndex = -1;
+    polaroids.forEach(function (card) {
+      var img = card.querySelector("img");
+      if (img && img.src) photoSrcs.push(img.src);
+    });
+
+    function replayPhotoAnim() {
+      if (!photoViewer) return;
+      photoViewer.style.animation = "none";
+      void photoViewer.offsetWidth;
+      photoViewer.style.animation = "";
+    }
+
+    function showPhotoAt(i) {
+      if (!photoSrcs.length || !photoViewer) return;
+      photoIndex = ((i % photoSrcs.length) + photoSrcs.length) % photoSrcs.length;
+      photoViewer.src = photoSrcs[photoIndex];
+      replayPhotoAnim();
+    }
+
     function openPhoto(src) {
       if (!src || !photoViewer) return;
-      photoViewer.src = src;
+      var idx = photoSrcs.indexOf(src);
+      showPhotoAt(idx >= 0 ? idx : 0);
       if (photoModalInstance) {
         photoModalInstance.show();
       } else if (photoModalEl) {
@@ -659,6 +683,31 @@
         photoModalEl.style.display = "block";
       }
     }
+
+    if (photoPrevBtn) {
+      photoPrevBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        showPhotoAt(photoIndex - 1);
+      });
+    }
+    if (photoNextBtn) {
+      photoNextBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        showPhotoAt(photoIndex + 1);
+      });
+    }
+    // tap the photo itself to advance
+    if (photoViewer) {
+      photoViewer.addEventListener("click", function () {
+        showPhotoAt(photoIndex + 1);
+      });
+    }
+    // arrow keys cycle while the lightbox is open
+    document.addEventListener("keydown", function (e) {
+      if (!photoModalEl || !photoModalEl.classList.contains("show")) return;
+      if (e.key === "ArrowLeft") showPhotoAt(photoIndex - 1);
+      else if (e.key === "ArrowRight") showPhotoAt(photoIndex + 1);
+    });
 
     // hand-scattered starting arrangement: [x%, y%, rotation]
     var SCRAP_LAYOUT = [

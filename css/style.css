@@ -690,15 +690,37 @@ img { max-width: 100%; }
 .photo-modal-body {
   padding: 0; background: #000; border-radius: 16px; overflow: hidden;
   display: flex; justify-content: center; align-items: center;
+  position: relative;
 }
 .photo-modal-body img {
   display: block; max-width: 100%; max-height: 80vh;
   width: auto; height: auto; border-radius: 16px;
   animation: photoIn .35s cubic-bezier(.22,.61,.36,1) both;
+  cursor: pointer;
 }
 @keyframes photoIn {
   from { opacity: 0; transform: scale(.94); }
   to   { opacity: 1; transform: scale(1); }
+}
+/* prev / next cycling */
+.photo-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  background: rgba(0,0,0,.55); color: #d8b98a;
+  border: 1px solid rgba(216,185,138,.35); border-radius: 50%;
+  width: 44px; height: 44px; font-size: 1.3rem; line-height: 1;
+  display: grid; place-items: center; cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: color .2s, border-color .2s, background .2s;
+}
+.photo-nav:hover {
+  color: #f0d9ad; border-color: #d8b98a; background: rgba(0,0,0,.75);
+}
+.photo-prev { left: 14px; }
+.photo-next { right: 14px; }
+@media (max-width: 575px) {
+  .photo-nav { width: 38px; height: 38px; font-size: 1.1rem; }
+  .photo-prev { left: 8px; }
+  .photo-next { right: 8px; }
 }
 
 /* ---- Video modal (YouTube Shorts embed) ---- */
