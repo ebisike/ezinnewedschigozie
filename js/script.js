@@ -468,6 +468,283 @@
     });
   }
   window.addEventListener("load", initWishCards);
+
+  /* ---------- Wishes: read aloud (per wish, pause/resume) ---------- */
+  var speakCards = document.querySelectorAll(".wish-card");
+  var synth = window.speechSynthesis;
+
+  if (synth && speakCards.length) {
+    var activeSpeak = null; // the btn currently reading
+    var activeText = "";
+
+    // voice speeds — calm default, faster options
+    var SPEEDS = [0.75, 0.9, 1, 1.15, 1.3, 1.5];
+    var speedIndex = 1; // 0.9× calm
+    var speedLabel = document.getElementById("readSpeedLabel");
+
+    // prefer a female English voice
+    var femaleVoice = null;
+    function pickFemaleVoice() {
+      var voices = synth.getVoices() || [];
+      if (!voices.length) return null;
+      var prefer = [
+        "Google UK English Female",
+        "Microsoft Aria", "Microsoft Jenny", "Microsoft Michelle",
+        "Microsoft Zira", "Microsoft Hazel", "Microsoft Susan",
+        "Samantha", "Karen", "Moira", "Tessa", "Fiona", "Serena", "Veena"
+      ];
+      var en = voices.filter(function (v) { return /^en/i.test(v.lang); });
+      var pool = en.length ? en : voices;
+      for (var p = 0; p < prefer.length; p++) {
+        for (var v = 0; v < pool.length; v++) {
+          if (pool[v].name.indexOf(prefer[p]) > -1) return pool[v];
+        }
+      }
+      for (var f = 0; f < pool.length; f++) {
+        if (/female/i.test(pool[f].name)) return pool[f];
+      }
+      return pool[0];
+    }
+    femaleVoice = pickFemaleVoice();
+    if (typeof synth.onvoiceschanged !== "undefined") {
+      synth.onvoiceschanged = function () {
+        femaleVoice = pickFemaleVoice();
+      };
+    }
+
+    function setSpeakState(btn, state) {
+      var icon = btn.querySelector("i");
+      btn.classList.remove("is-speaking");
+      btn.dataset.state = state;
+      if (state === "speaking") {
+        icon.className = "bi bi-pause-fill";
+        btn.classList.add("is-speaking");
+        btn.setAttribute("aria-label", "Pause reading");
+        btn.title = "Pause reading";
+      } else if (state === "paused") {
+        icon.className = "bi bi-play-fill";
+        btn.setAttribute("aria-label", "Resume reading");
+        btn.title = "Resume reading";
+      } else {
+        icon.className = "bi bi-volume-up-fill";
+        btn.setAttribute("aria-label", "Read this wish aloud");
+        btn.title = "Read aloud";
+      }
+    }
+
+    function stopSpeaking() {
+      if (activeSpeak) {
+        setSpeakState(activeSpeak, "idle");
+        activeSpeak = null;
+        activeText = "";
+      }
+      try { synth.cancel(); } catch (e) {}
+    }
+
+    function speakWish(btn, text) {
+      var utter = new SpeechSynthesisUtterance(text);
+      if (femaleVoice) utter.voice = femaleVoice;
+      utter.rate = SPEEDS[speedIndex];
+      utter.pitch = 1;
+      utter.onend = function () {
+        if (activeSpeak === btn) stopSpeaking();
+      };
+      utter.onerror = function () {
+        if (activeSpeak === btn) stopSpeaking();
+      };
+      activeSpeak = btn;
+      activeText = text;
+      setSpeakState(btn, "speaking");
+      synth.speak(utter);
+    }
+
+    function wishText(el) {
+      return (el.textContent || "").trim()
+        .replace(/^["\u201C]+/, "")
+        .replace(/["\u201D]+$/, "");
+    }
+
+    speakCards.forEach(function (card) {
+      var textEl = card.querySelector(".wish-text");
+      if (!textEl) return;
+
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-speak";
+      btn.innerHTML = '<i class="bi bi-volume-up-fill"></i>';
+      setSpeakState(btn, "idle");
+      card.appendChild(btn);
+
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+
+        var state = btn.dataset.state;
+        if (state === "speaking") {
+          synth.pause();
+          setSpeakState(btn, "paused");
+          return;
+        }
+        if (state === "paused") {
+          activeSpeak = btn;
+          synth.resume();
+          setSpeakState(btn, "speaking");
+          return;
+        }
+
+        // idle → start fresh (stops any other wish being read)
+        stopSpeaking();
+        speakWish(btn, wishText(textEl));
+      });
+    });
+
+    // speed control — explicit slower / faster buttons
+    var speedUpBtn = document.getElementById("speedUp");
+    var speedDownBtn = document.getElementById("speedDown");
+
+    function updateSpeedUi() {
+      if (speedLabel) speedLabel.textContent = SPEEDS[speedIndex] + "×";
+      if (speedUpBtn) speedUpBtn.disabled = speedIndex >= SPEEDS.length - 1;
+      if (speedDownBtn) speedDownBtn.disabled = speedIndex <= 0;
+    }
+
+    function changeSpeed(dir) {
+      var next = speedIndex + dir;
+      if (next < 0 || next >= SPEEDS.length) return;
+      speedIndex = next;
+      updateSpeedUi();
+      var wasReading = activeSpeak && activeText && (synth.speaking || synth.paused);
+      var restartBtn = activeSpeak;
+      var restartText = activeText;
+      stopSpeaking();
+      if (wasReading) speakWish(restartBtn, restartText);
+    }
+
+    if (speedUpBtn) speedUpBtn.addEventListener("click", function () { changeSpeed(1); });
+    if (speedDownBtn) speedDownBtn.addEventListener("click", function () { changeSpeed(-1); });
+    updateSpeedUi();
+
+    // Chrome stops long utterances after ~15s unless nudged.
+    setInterval(function () {
+      if (synth.speaking && !synth.paused) {
+        synth.pause();
+        synth.resume();
+      }
+    }, 12000);
+
+    window.addEventListener("beforeunload", function () {
+      try { synth.cancel(); } catch (e) {}
+    });
+  }
+  /* ---------- Gallery scrapbook — draggable polaroids ---------- */
+  var scrapBoard = document.getElementById("scrapBoard");
+  if (scrapBoard) {
+    var polaroids = scrapBoard.querySelectorAll(".polaroid");
+    var scrapZ = 1;
+
+    // photo lightbox
+    var photoModalEl = document.getElementById("photoModal");
+    var photoViewer = document.getElementById("photoViewer");
+    var photoModalInstance =
+      photoModalEl && window.bootstrap && bootstrap.Modal
+        ? bootstrap.Modal.getOrCreateInstance(photoModalEl)
+        : null;
+
+    function openPhoto(src) {
+      if (!src || !photoViewer) return;
+      photoViewer.src = src;
+      if (photoModalInstance) {
+        photoModalInstance.show();
+      } else if (photoModalEl) {
+        photoModalEl.classList.add("show");
+        photoModalEl.style.display = "block";
+      }
+    }
+
+    // hand-scattered starting arrangement: [x%, y%, rotation]
+    var SCRAP_LAYOUT = [
+      [2, 4, -6], [20, 0, 4], [38, 6, -3], [56, 1, 5], [74, 5, -5], [84, 10, 3],
+      [6, 26, 5], [24, 22, -4], [43, 28, 6], [62, 24, -6], [80, 30, 4],
+      [0, 48, 4], [18, 50, -5], [36, 52, 3], [55, 47, -4], [73, 52, 6],
+      [10, 72, -4], [48, 74, 5]
+    ];
+
+    function placePolaroid(card, x, y, rot) {
+      card.style.left = x + "%";
+      card.style.top = y + "%";
+      card.style.setProperty("--rot", rot + "deg");
+      card.dataset.rot = rot;
+    }
+
+    function layoutScrapbook() {
+      for (var i = 0; i < polaroids.length; i++) {
+        var spot = SCRAP_LAYOUT[i % SCRAP_LAYOUT.length];
+        placePolaroid(polaroids[i], spot[0], spot[1], spot[2]);
+      }
+    }
+    layoutScrapbook();
+
+    polaroids.forEach(function (card) {
+      card.addEventListener("pointerdown", function (e) {
+        e.preventDefault();
+        try { card.setPointerCapture(e.pointerId); } catch (err) {}
+
+        var boardRect = scrapBoard.getBoundingClientRect();
+        var cardRect = card.getBoundingClientRect();
+        var offX = e.clientX - cardRect.left;
+        var offY = e.clientY - cardRect.top;
+        var startX = e.clientX;
+        var startY = e.clientY;
+        var moved = false;
+
+        card.classList.add("dragging");
+        card.classList.remove("moving");
+        card.style.zIndex = ++scrapZ;
+
+        function onMove(ev) {
+          if (Math.abs(ev.clientX - startX) > 6 || Math.abs(ev.clientY - startY) > 6) {
+            moved = true;
+          }
+          var nx = ev.clientX - offX - boardRect.left;
+          var ny = ev.clientY - offY - boardRect.top;
+          nx = Math.max(0, Math.min(nx, boardRect.width - cardRect.width));
+          ny = Math.max(0, Math.min(ny, boardRect.height - cardRect.height));
+          card.style.left = (nx / boardRect.width * 100) + "%";
+          card.style.top = (ny / boardRect.height * 100) + "%";
+        }
+        function onUp() {
+          card.classList.remove("dragging");
+          card.removeEventListener("pointermove", onMove);
+          card.removeEventListener("pointerup", onUp);
+          card.removeEventListener("pointercancel", onUp);
+          // a tap (not a drag) opens the photo full-size
+          if (!moved) {
+            var img = card.querySelector("img");
+            if (img && img.src) openPhoto(img.src);
+          }
+        }
+        card.addEventListener("pointermove", onMove);
+        card.addEventListener("pointerup", onUp);
+        card.addEventListener("pointercancel", onUp);
+      });
+    });
+
+    var shuffleBtn = document.getElementById("shuffleBtn");
+    if (shuffleBtn) {
+      shuffleBtn.addEventListener("click", function () {
+        polaroids.forEach(function (card) {
+          card.classList.add("moving");
+          var x = Math.random() * 80;
+          var y = Math.random() * 74;
+          var rot = Math.random() * 20 - 10;
+          placePolaroid(card, x, y, rot);
+        });
+        setTimeout(function () {
+          polaroids.forEach(function (card) { card.classList.remove("moving"); });
+        }, 550);
+      });
+    }
+  }
+
   /* ---------- Theme picker (explore palettes) ---------- */
   var themePicker = document.getElementById("themePicker");
   var themePanel = document.getElementById("themePanel");

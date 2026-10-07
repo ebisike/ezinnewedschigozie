@@ -381,19 +381,72 @@ img { max-width: 100%; }
 .mile-text p { color: var(--white-45); font-size: .95rem; line-height: 1.75; margin: 0; max-width: 34rem; }
 .milestone.flip .mile-text p { margin-left: auto; }
 
-/* ---- Gallery (arches) ---- */
-.gallery-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+/* ---- Gallery — draggable scrapbook ---- */
+.scrap-tools {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem;
 }
-@media (min-width: 768px) { .gallery-grid { grid-template-columns: repeat(4, 1fr); gap: 1.2rem; } }
-.arch {
-  aspect-ratio: 3/4; overflow: hidden; position: relative;
-  border-radius: 999px 999px 14px 14px; background: var(--card-2);
-  border: 1px solid var(--hairline);
-  transition: opacity .25s ease; display: block; width: 100%; padding: 0;
+.scrap-hint {
+  font-size: 8.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .3em; color: var(--white-30);
 }
-.arch img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.arch:hover { opacity: .88; }
+.scrap-hint i { color: var(--gold-soft); margin-right: .35rem; }
+.btn-scrap-shuffle {
+  background: transparent; border: 1px solid var(--gold-faint);
+  color: var(--gold); font-family: var(--font-body);
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .3em;
+  padding: .6rem 1.2rem; border-radius: 50px; cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
+}
+.btn-scrap-shuffle:hover {
+  border-color: var(--gold); color: var(--gold-hover);
+  background: rgba(201,164,77,.06);
+}
+.scrap-board {
+  position: relative; height: 640px;
+  border: 1px solid var(--hairline); border-radius: 18px;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(201,164,77,.05), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(201,164,77,.04), transparent 40%),
+    var(--card-2);
+  overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y; /* board itself still scrolls the page on touch */
+}
+.polaroid {
+  position: absolute; width: 158px; padding: 8px 8px 26px;
+  background: #f6f1e7; border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  cursor: grab; touch-action: none; user-select: none;
+  transform: rotate(var(--rot, 0deg));
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
+  will-change: transform;
+}
+.polaroid img {
+  width: 100%; height: 150px; object-fit: cover; display: block;
+  border-radius: 2px; pointer-events: none;
+}
+/* champagne tape strip */
+.polaroid::after {
+  content: ""; position: absolute; top: -10px; left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 64px; height: 20px;
+  background: rgba(216,185,138,.45);
+  border: 1px dashed rgba(90,74,48,.25); border-radius: 2px;
+}
+.polaroid.dragging {
+  cursor: grabbing;
+  transform: rotate(var(--rot, 0deg)) scale(1.07);
+  box-shadow: 0 22px 46px rgba(0,0,0,.5);
+}
+/* position animation for shuffle only (never while dragging) */
+.polaroid.moving { transition: left .5s cubic-bezier(.22,.61,.36,1), top .5s cubic-bezier(.22,.61,.36,1), transform .5s cubic-bezier(.22,.61,.36,1); }
+@media (max-width: 575px) {
+  .scrap-board { height: 560px; }
+  .polaroid { width: 112px; padding: 6px 6px 20px; }
+  .polaroid img { height: 106px; }
+  .polaroid::after { width: 48px; height: 16px; top: -8px; }
+}
 
 /* ---- Videos (how well do you know us) — swipeable Shorts row ---- */
 .video-swipe { position: relative; }
@@ -555,6 +608,55 @@ img { max-width: 100%; }
 }
 .btn-read-more:hover { color: var(--gold-hover); }
 
+/* read-aloud button (one per wish) */
+.btn-speak {
+  position: absolute; top: .95rem; right: .95rem; z-index: 2;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(127,127,127,.12); border: 1px solid var(--gold-faint);
+  color: var(--gold); cursor: pointer;
+  display: grid; place-items: center; font-size: .9rem; line-height: 1;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease, background .2s ease;
+}
+.btn-speak:hover {
+  color: var(--gold-hover); border-color: var(--gold);
+  transform: scale(1.1); background: rgba(201,164,77,.08);
+}
+.btn-speak.is-speaking {
+  border-color: var(--gold); color: var(--gold-hover);
+  animation: speakPulse 1.4s ease-in-out infinite;
+}
+@keyframes speakPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,164,77,.35); }
+  50%      { box-shadow: 0 0 0 7px rgba(201,164,77,0); }
+}
+
+/* voice speed stepper (wishes section) */
+.voice-speed {
+  display: inline-flex; align-items: center; gap: .6rem; margin-top: .4rem;
+}
+.voice-speed-label {
+  font-size: 8.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .3em; color: var(--white-30);
+}
+.voice-speed-label i { color: var(--gold-soft); margin-right: .3rem; }
+.voice-speed-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: transparent; border: 1px solid var(--gold-faint);
+  color: var(--gold); cursor: pointer;
+  display: grid; place-items: center; font-size: .8rem; line-height: 1;
+  transition: color .2s, border-color .2s, transform .2s, opacity .2s;
+}
+.voice-speed-btn:hover:not(:disabled) {
+  color: var(--gold-hover); border-color: var(--gold); transform: scale(1.1);
+}
+.voice-speed-btn:disabled { opacity: .3; cursor: default; }
+.voice-speed-value {
+  min-width: 3.2em; text-align: center;
+  font-size: 10px; font-weight: 700; letter-spacing: .1em;
+  color: var(--gold); tab-size: 1;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---- RSVP ---- */
 .rsvp-wrap { max-width: 44rem; margin: 0 auto; }
 .rsvp-card {
@@ -584,6 +686,23 @@ img { max-width: 100%; }
 }
 .rsvp-card .input-group .form-control { border-left: none; border-radius: 0 10px 10px 0; }
 .rsvp-card .invalid-feedback { color: #d98c8c; }
+
+/* ---- Photo lightbox (scrapbook full view) ---- */
+.photo-modal-dialog { max-width: 900px; }
+.photo-modal-content { background: transparent; border: none; border-radius: 16px; padding: 0; }
+.photo-modal-body {
+  padding: 0; background: #000; border-radius: 16px; overflow: hidden;
+  display: flex; justify-content: center; align-items: center;
+}
+.photo-modal-body img {
+  display: block; max-width: 100%; max-height: 80vh;
+  width: auto; height: auto; border-radius: 16px;
+  animation: photoIn .35s cubic-bezier(.22,.61,.36,1) both;
+}
+@keyframes photoIn {
+  from { opacity: 0; transform: scale(.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
 
 /* ---- Video modal (YouTube Shorts embed) ---- */
 .video-modal-dialog { max-width: 520px; }
