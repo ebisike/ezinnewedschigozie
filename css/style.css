@@ -75,7 +75,8 @@ img { max-width: 100%; }
 
 /* ---- Minimal fixed nav ---- */
 #mainNav {
-  position: fixed; inset-x: 0; top: 0; z-index: 50;
+  position: fixed; top: 0; left: 0; right: 0; width: 100%;
+  z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.1rem 1.5rem;
   transition: background .35s ease, padding .3s ease;
