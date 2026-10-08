@@ -112,7 +112,7 @@ img { max-width: 100%; }
   position: absolute; inset: 0;
   /* taller than the viewport so the visible window anchors to the image's
      lower area, lifting the couple's faces above the text */
-  background-size: auto 100%;
+  background-size: auto 110%;
   background-position: center bottom;
   opacity: .8;
 }
