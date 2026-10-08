@@ -126,7 +126,7 @@ img { max-width: 100%; }
 /* mobile: push text down so the couple's faces show above it */
 @media (max-width: 767px) {
   .hero { align-items: flex-end; }
-  .hero-content { padding: 6rem 1.25rem 4.75rem; }
+  .hero-content { padding: 6rem 1.25rem 6.75rem; }
   .hero-bg { background-position: center 26%; }
 }
 .hero-eyebrow {
