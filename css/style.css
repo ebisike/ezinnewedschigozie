@@ -112,7 +112,7 @@ img { max-width: 100%; }
   position: absolute; inset: 0;
   /* taller than the viewport so the visible window anchors to the image's
      lower area, lifting the couple's faces above the text */
-  background-size: auto 112%;
+  background-size: auto 100%;
   background-position: center bottom;
   opacity: .8;
 }
@@ -130,7 +130,7 @@ img { max-width: 100%; }
    faces get the whole upper half of the screen */
 @media (max-width: 767px) {
   .hero-content { padding: 3.5rem 1.25rem 5rem; }
-  .hero-bg { background-size: auto 120%; background-position: center bottom; }
+  .hero-bg { background-size: auto 106%; background-position: center bottom; }
   .hero-eyebrow { margin-bottom: 1rem; }
   .hero-names .hero-name { font-size: clamp(2.2rem, 8.5vw, 3.2rem); }
   .hero-amp { font-size: clamp(1.4rem, 5vw, 2rem); margin: .3rem 0; }
