@@ -254,10 +254,20 @@
           return;
         }
 
+        // document id: firstname-lastname-phone (sanitized, deterministic —
+        // a repeated submission updates the same record instead of duplicating)
+        function rsvpDocId(p) {
+          var first = (p.firstName || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+          var last = (p.lastName || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+          var phone = (p.phone || "").replace(/[^0-9+]/g, "");
+          return first + "-" + last + "-" + phone;
+        }
+
         firebase
           .firestore()
           .collection("rsvps")
-          .add({
+          .doc(rsvpDocId(payload))
+          .set({
             firstName: payload.firstName,
             lastName: payload.lastName,
             phone: payload.phone,
