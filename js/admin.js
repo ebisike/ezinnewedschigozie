@@ -22,7 +22,7 @@
   var statTotal = document.getElementById("statTotal");
   var statAttending = document.getElementById("statAttending");
   var statDeclined = document.getElementById("statDeclined");
-  var statLatest = document.getElementById("statLatest");
+  var statOnline = document.getElementById("statOnline");
   var countBadge = document.getElementById("countBadge");
 
   var rsvps = [];
@@ -188,15 +188,17 @@
     var total = list.length;
     var attending = 0;
     var declined = 0;
+    var online = 0;
     list.forEach(function (r) {
       if (r.attending === "yes") attending++;
       else if (r.attending === "no") declined++;
+      else if (r.attending === "online") online++;
     });
 
     if (statTotal) statTotal.textContent = String(total);
     if (statAttending) statAttending.textContent = String(attending);
     if (statDeclined) statDeclined.textContent = String(declined);
-    if (statLatest) statLatest.textContent = total ? formatDate(list[0].submittedAt) : "—";
+    if (statOnline) statOnline.textContent = String(online);
     if (countBadge) countBadge.textContent = total + (total === 1 ? " submission" : " submissions");
   }
 
@@ -223,6 +225,8 @@
       var attendingPill =
         r.attending === "yes"
           ? '<span class="attend-pill attend-yes">Yes</span>'
+          : r.attending === "online"
+          ? '<span class="attend-pill attend-online">Online</span>'
           : '<span class="attend-pill attend-no">No</span>';
       var msg = r.message
         ? '<span class="msg-text">' + escapeHtml(r.message) + "</span>"
@@ -261,7 +265,7 @@
         .forEach(function (r, i) {
           rows.push([
             i + 1, r.firstName, r.lastName, r.phone,
-            r.attending === "yes" ? "Yes" : "No",
+            r.attending === "yes" ? "Yes" : r.attending === "online" ? "Online" : "No",
             r.country, r.state, r.message, formatDate(r.submittedAt)
           ]);
         });

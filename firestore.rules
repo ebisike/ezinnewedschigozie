@@ -19,7 +19,7 @@ service cloud.firestore {
         && request.resource.data.phone is string
         && request.resource.data.phone.size() >= 7
         && request.resource.data.phone.size() <= 30
-        && request.resource.data.attending in ['yes','no']
+        && request.resource.data.attending in ['yes','no','online']
         && request.resource.data.country is string
         && request.resource.data.country.size() <= 80
         && request.resource.data.state is string

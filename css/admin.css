@@ -130,6 +130,8 @@
 .stat-attending strong { color: #54683c; }
 .stat-declined i { color: var(--rose-deep); }
 .stat-declined strong { color: var(--rose-deep); }
+.stat-online i { color: var(--gold); }
+.stat-online strong { color: var(--gold); }
 .stat-latest i { color: var(--gold); }
 .stat-latest strong { font-size: 1rem; margin-top: .2rem; }
 
@@ -177,6 +179,7 @@
 }
 .attend-yes { background: rgba(111,138,84,.16); color: #54683c; border: 1px solid rgba(111,138,84,.35); }
 .attend-no { background: rgba(143,91,85,.14); color: var(--rose-deep); border: 1px solid rgba(143,91,85,.3); }
+.attend-online { background: rgba(201,169,106,.14); color: #8a6d2f; border: 1px solid rgba(201,169,106,.45); }
 .msg-cell { max-width: 260px; }
 .msg-text { color: var(--text-muted); font-style: italic; }
 .submitted-cell { white-space: nowrap; color: var(--text-muted); font-size: .82rem; }
